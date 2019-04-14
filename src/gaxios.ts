@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as extend from 'extend';
+import extend from 'extend';
 import {Agent} from 'https';
 import fetch, {Response} from 'node-fetch';
 import * as qs from 'querystring';
