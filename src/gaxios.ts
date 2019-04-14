@@ -14,9 +14,9 @@
 import extend from 'extend';
 import {Agent} from 'https';
 import fetch, {Response} from 'node-fetch';
-import * as qs from 'querystring';
-import * as stream from 'stream';
-import * as url from 'url';
+import qs from 'querystring';
+import stream from 'stream';
+import url from 'url';
 
 import {GaxiosError, GaxiosOptions, GaxiosPromise, GaxiosResponse, Headers} from './common';
 import {isBrowser} from './isbrowser';
