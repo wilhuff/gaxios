@@ -14,15 +14,11 @@
 import extend from 'extend';
 import {Agent} from 'https';
 import fetch, {Response} from 'node-fetch';
-import qs from 'querystring';
 import stream from 'stream';
-import url from 'url';
+import {URL} from 'url';
 
 import {GaxiosError, GaxiosOptions, GaxiosPromise, GaxiosResponse, Headers} from './common';
-import {isBrowser} from './isbrowser';
 import {getRetryConfig} from './retry';
-
-const URL = isBrowser() ? window.URL : url.URL;
 
 // tslint:disable-next-line variable-name no-any
 let HttpsProxyAgent: any;
@@ -125,13 +121,13 @@ export class Gaxios {
     if (baseUrl) {
       opts.url = baseUrl + opts.url;
     }
-
     const parsedUrl = new URL(opts.url);
     opts.url = `${parsedUrl.origin}${parsedUrl.pathname}`;
-    opts.params = extend(
-        qs.parse(parsedUrl.search.substr(1)),  // removes leading ?
+    opts.params = Object.assign(
+        {},
+        ...[...(parsedUrl as any).searchParams.entries()].map(
+            ([k, v]) => ({[k]: v})),
         opts.params);
-
     opts.paramsSerializer = opts.paramsSerializer || this.paramsSerializer;
     if (opts.params) {
       parsedUrl.search = opts.paramsSerializer(opts.params);
@@ -192,7 +188,7 @@ export class Gaxios {
    * @param params key value pars to encode
    */
   private paramsSerializer(params: {[index: string]: string|number}) {
-    return qs.stringify(params);
+    return (new URLSearchParams(params as any)).toString();
   }
 
   private isReadableStream(obj: any): boolean {
