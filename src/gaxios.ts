@@ -13,12 +13,14 @@
 
 import extend from 'extend';
 import {Agent} from 'https';
-import fetch, {Response} from 'node-fetch';
+import {Response} from 'node-fetch';
 import stream from 'stream';
 import {URL} from 'url';
 
 import {GaxiosError, GaxiosOptions, GaxiosPromise, GaxiosResponse, Headers} from './common';
 import {getRetryConfig} from './retry';
+
+const IS_BROWSER = !!process.env.BROWSER;
 
 // tslint:disable-next-line variable-name no-any
 let HttpsProxyAgent: any;
@@ -33,7 +35,24 @@ function loadProxy() {
   }
   return proxy;
 }
-loadProxy();
+
+if (!IS_BROWSER) {
+  loadProxy();
+}
+
+// In browser use window.fetch, node use node-fetch.
+let fetch: typeof import('node-fetch').default;
+async function loadFetch() {
+  if (!fetch) {
+    if (IS_BROWSER) {
+      fetch = window.fetch as any;
+    } else {
+      fetch = (await import('node-fetch')).default;
+    }
+  }
+  return fetch;
+}
+loadFetch();
 
 export class Gaxios {
   private agentCache = new Map<string, Agent>();
@@ -62,6 +81,7 @@ export class Gaxios {
       if (opts.adapter) {
         translatedResponse = await opts.adapter<T>(opts);
       } else {
+        await loadFetch();
         const res = await fetch(opts.url!, opts);
         const data = await this.getResponseData(opts, res);
         translatedResponse = this.translateResponse<T>(opts, res, data);
@@ -85,8 +105,7 @@ export class Gaxios {
     }
   }
 
-  private async getResponseData(opts: GaxiosOptions, res: Response):
-      Promise<any> {
+  private async getResponseData(opts: GaxiosOptions, res: any): Promise<any> {
     switch (opts.responseType) {
       case 'stream':
         return res.body;
@@ -162,13 +181,15 @@ export class Gaxios {
     }
     opts.method = opts.method || 'GET';
 
-    const proxy = loadProxy();
-    if (proxy) {
-      if (this.agentCache.has(proxy)) {
-        opts.agent = this.agentCache.get(proxy);
-      } else {
-        opts.agent = new HttpsProxyAgent(proxy);
-        this.agentCache.set(proxy, opts.agent!);
+    if (!IS_BROWSER) {
+      const proxy = loadProxy();
+      if (proxy) {
+        if (this.agentCache.has(proxy)) {
+          opts.agent = this.agentCache.get(proxy);
+        } else {
+          opts.agent = new HttpsProxyAgent(proxy);
+          this.agentCache.set(proxy, opts.agent!);
+        }
       }
     }
 
