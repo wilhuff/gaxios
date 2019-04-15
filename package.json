@@ -19,7 +19,7 @@
     "pretest": "npm run compile",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json",
     "prerollup": "tsc -p tsconfig.web.json",
-    "rollup": "BROWSER=true rollup -c",
+    "rollup": "IS_BROWSER=true rollup -c",
     "prebrowser-test": "npm run compile",
     "browser-test": "node build/browser-test/browser-test-runner.js"
   },
@@ -62,6 +62,7 @@
     "puppeteer": "^1.12.2",
     "rollup": "^1.10.0",
     "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-filesize": "^6.0.1",
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^4.2.3",
     "rollup-plugin-replace": "^2.2.0",

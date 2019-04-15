@@ -20,7 +20,7 @@ import {URL} from 'url';
 import {GaxiosError, GaxiosOptions, GaxiosPromise, GaxiosResponse, Headers} from './common';
 import {getRetryConfig} from './retry';
 
-const IS_BROWSER = !!process.env.BROWSER;
+const IS_BROWSER = !!process.env.IS_BROWSER;
 
 // tslint:disable-next-line variable-name no-any
 let HttpsProxyAgent: any;

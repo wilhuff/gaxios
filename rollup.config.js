@@ -5,6 +5,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import visualizer from 'rollup-plugin-visualizer';
 import { terser } from "rollup-plugin-terser";
 import replace from 'rollup-plugin-replace';
+import filesize from 'rollup-plugin-filesize';
 
 export default {
   input: 'build/web/src/index.js',
@@ -13,10 +14,11 @@ export default {
     format: 'esm'
   },
   plugins: [
-    replace({ IS_BROWSER: !!process.env.BROWSER }),
+    replace({ 'process.env.IS_BROWSER': !!process.env.IS_BROWSER }),
     resolve(),
     commonjs(),
     terser(),
-    visualizer()
+    visualizer(),
+    filesize()
   ]
 }
