@@ -9,6 +9,7 @@
     "esModuleInterop": true
   },
   "include": [
-    "src/*.ts"
+    "src/*.ts",
+    "browser-test/test.*.ts"
   ]
 }
